@@ -105,7 +105,7 @@ namespace Sitecore.Support.ContentTesting.Mvc.Pipelines.Response.RequestBegin
       }
 
       // If no forced combination and we're editing, jump out. We don't want to test in page editor
-      if (Context.PageMode.IsPageEditor)
+      if (Context.PageMode.IsExperienceEditor)
       {
         return;
       }
