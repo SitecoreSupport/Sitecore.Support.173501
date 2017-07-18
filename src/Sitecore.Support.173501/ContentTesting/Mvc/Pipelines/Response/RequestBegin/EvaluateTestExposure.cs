@@ -14,6 +14,7 @@ using Sitecore.Diagnostics;
 using Sitecore.ContentTesting;
 using Sitecore.Mvc.Pipelines.Request.RequestBegin;
 using Sitecore.ContentTesting.Pipelines;
+using System;
 
 namespace Sitecore.Support.ContentTesting.Mvc.Pipelines.Response.RequestBegin
 {
@@ -195,17 +196,26 @@ namespace Sitecore.Support.ContentTesting.Mvc.Pipelines.Response.RequestBegin
 
       for (int i = 0; i < combination.Combination.Length; i++)
       {
-        var testValue = combination.GetValue(i);
-
-        if (!testValueInspector.IsValidDataSource(testConfiguration.TestDefinitionItem, testValue))
+#region Fix
+        // Fix is a simple try/catch, so no exception will occur on customer's production
+        try
         {
-          var suspendTestArgs = new SuspendTestArgs(testConfiguration);
-          SuspendTestPipeline.Instance.Run(suspendTestArgs);
+          var testValue = combination.GetValue(i);
 
+          if (!testValueInspector.IsValidDataSource(testConfiguration.TestDefinitionItem, testValue))
+          {
+            var suspendTestArgs = new SuspendTestArgs(testConfiguration);
+            SuspendTestPipeline.Instance.Run(suspendTestArgs);
+
+            return false;
+          }
+        }
+        catch(InvalidOperationException exc)
+        {
           return false;
         }
+#endregion
       }
-
       return true;
     }
   }
